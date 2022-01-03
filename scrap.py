@@ -4,11 +4,14 @@ from math import ceil
 import csv
 import os
 
+
+
 def create_csv(csv_title):
     with open(csv_title, 'w') as file:
         writer = csv.writer(file, delimiter=',')
         header = ["title","upc","price_including_taxe","price_excluding_taxe","number_available","product_description","category_book","review_ratings"]
         writer.writerow(header)
+
 
 def find_book(url):
     books = []
@@ -21,6 +24,9 @@ def find_book(url):
         books.append('http://books.toscrape.com/catalogue' + link_book)
     return books
 
+
+images = []
+images_names = []
 def write_book(category, url):
     with open(category, 'a', encoding="utf-8-sig") as file:
         response = requests.get(url)
@@ -50,6 +56,8 @@ def scrap_images(images, images_names):
             im = requests.get(image)
             f.write(im.content) 
 
+
+
 urls_categories = []
 url = "https://books.toscrape.com/"
 page = requests.get(url)
@@ -58,7 +66,7 @@ links_categories = soup_page.find('ul', class_="nav-list").find('ul').findAll('a
 for category in links_categories:
     href = category['href'].replace('index.html', '')
     urls_categories.append(url + href)
-"""Ici nous avons récupéré tous les liens de toutes les catégories de livre"""
+
 
 for category in urls_categories:
     page_category = requests.get(category)
@@ -77,11 +85,9 @@ for category in urls_categories:
     for page in category_pages:
         books = find_book(page)
         for book in books:
-            images = []
-            images_names = [] 
-            new_book = write_book(title,book)
+            write_book(title,book)
 
-print(new_book[0])
-"""os.mkdir(os.path.join(os.getcwd(), 'images'))
+
+os.mkdir(os.path.join(os.getcwd(), 'images'))
 os.chdir(os.path.join(os.getcwd(), 'images'))
-scrap_images(new_book[0], new_book[1])"""
+scrap_images(images,images_names)
