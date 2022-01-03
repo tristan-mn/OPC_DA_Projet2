@@ -5,8 +5,14 @@ import csv
 import os
 
 
-
 def create_csv(csv_title):
+    """
+    Cette fonction créé un fichier csv avec pour chacun le header
+    le fichier est créé avec le nom de la catégorie
+
+    Args:
+        csv_title (str): titre de chaque catégorie scrapé
+    """
     with open(csv_title, 'w') as file:
         writer = csv.writer(file, delimiter=',')
         header = ["title","upc","price_including_taxe","price_excluding_taxe","number_available","product_description","category_book","review_ratings"]
@@ -14,6 +20,14 @@ def create_csv(csv_title):
 
 
 def find_book(url):
+    """ cette fonction va dans toutes les pages de la catégorie pour récupérer les urls de tous les livres
+
+    Args:
+        url (string): lien de la page dans une catégorie
+
+    Returns:
+        liste : la fonction retourne la liste de tous les livres de la catégorie
+    """
     books = []
     category_page = requests.get(url)
     soup_category_page = BeautifulSoup(category_page.text, 'html.parser')
@@ -28,6 +42,12 @@ def find_book(url):
 images = []
 images_names = []
 def write_book(category, url):
+    """Cette fonction récupère les informations que nous voulons sur chaque livre et les écrit dans le csv de la catégorie
+
+    Args:
+        category (string): titre de la catégorie et du fichier pour le modifier
+        url (string): url du livre à scraper
+    """
     with open(category, 'a', encoding="utf-8-sig") as file:
         response = requests.get(url)
         writer = csv.writer(file, delimiter=',')
@@ -40,17 +60,20 @@ def write_book(category, url):
         product_description = soup.findAll('p')[3].text.strip().replace(',', '').replace("\"", "")
         category_book = soup.find('ul', class_='breadcrumb').findAll('li')[2].text.strip()
         review_ratings = soup.find(text='Number of reviews').next.next.text
-        # recupere l'image
         image_url = soup.find('img')['src'].replace('../..', 'https://books.toscrape.com/')
-        # on recupere le alt de l'image pour en faire son nom
         name = soup.find('img')['alt'] + ".png"
-        # on rajoute tout dans les tableaux
         informations = [title, upc, price_including_taxe, price_excluding_taxe, number_available, product_description, category_book, review_ratings, image_url]
         images.append(image_url)
         images_names.append(name)
         writer.writerow(informations)
 
 def scrap_images(images, images_names):
+    """ cette fonction créé un fichier image avec le contenu de l'image
+
+    Args:
+        images (liste): liste des urls des images
+        images_names (liste): liste des noms récupérés des images
+    """
     for image, name in zip(images, images_names):
         with open(name.replace(' ', '-').replace("/", " "), 'wb') as f:
             im = requests.get(image)
