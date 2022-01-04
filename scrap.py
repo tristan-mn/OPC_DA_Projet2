@@ -14,8 +14,8 @@ def create_csv(csv_title):
         csv_title (str): titre de chaque catégorie scrapé
     """
     with open(csv_title, 'w') as file:
-        writer = csv.writer(file, delimiter=',')
-        header = ["title","upc","price_including_taxe","price_excluding_taxe","number_available","product_description","category_book","review_ratings"]
+        writer = csv.writer(file, delimiter=';')
+        header = ["title","upc","price_including_taxe","price_excluding_taxe","number_available","product_description","category_book","review_ratings","image_url"]
         writer.writerow(header)
 
 
@@ -50,7 +50,7 @@ def write_book(category, url):
     """
     with open(category, 'a', encoding="utf-8-sig") as file:
         response = requests.get(url)
-        writer = csv.writer(file, delimiter=',')
+        writer = csv.writer(file, delimiter=';')
         soup = BeautifulSoup(response.text, 'html.parser')
         title = soup.find('div', class_="product_main").find('h1').text.replace(",", "").replace("\"", "")
         upc = soup.find(text='UPC').next.text
